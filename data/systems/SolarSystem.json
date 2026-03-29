@@ -1,0 +1,118 @@
+{
+  "name": "Sol",
+  "star_mu": 1.32712440042e20,
+  "bodies": [
+    {
+      "name": "Mercury",
+      "mass": 3.3011e23,
+      "radius": 2439700.0,
+      "orbit": {
+        "semi_major_axis": 57909175271.7,
+        "eccentricity": 0.20563069,
+        "inclination": 0.12225805,
+        "longitude_of_asc_node": 0.84354677,
+        "argument_of_periapsis": 0.50832330,
+        "mean_anomaly_at_epoch": 3.05073762,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Venus",
+      "mass": 4.8675e24,
+      "radius": 6051800.0,
+      "orbit": {
+        "semi_major_axis": 108208925508.8,
+        "eccentricity": 0.00677323,
+        "inclination": 0.05924887,
+        "longitude_of_asc_node": 1.33833051,
+        "argument_of_periapsis": 0.95735306,
+        "mean_anomaly_at_epoch": 0.88046188,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Earth",
+      "mass": 5.9722e24,
+      "radius": 6371000.0,
+      "orbit": {
+        "semi_major_axis": 149598016462.9,
+        "eccentricity": 0.01671022,
+        "inclination": 0.00000087,
+        "longitude_of_asc_node": 6.08665006,
+        "argument_of_periapsis": 1.99330267,
+        "mean_anomaly_at_epoch": 6.23985157,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Mars",
+      "mass": 6.4171e23,
+      "radius": 3389500.0,
+      "orbit": {
+        "semi_major_axis": 227939185705.3,
+        "eccentricity": 0.09341233,
+        "inclination": 0.03229924,
+        "longitude_of_asc_node": 0.86530876,
+        "argument_of_periapsis": 4.99971032,
+        "mean_anomaly_at_epoch": 0.33881169,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Jupiter",
+      "mass": 1.8982e27,
+      "radius": 69911000.0,
+      "orbit": {
+        "semi_major_axis": 778412026117.2,
+        "eccentricity": 0.04839266,
+        "inclination": 0.02278178,
+        "longitude_of_asc_node": 1.75503590,
+        "argument_of_periapsis": 4.78565267,
+        "mean_anomaly_at_epoch": 0.34296645,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Saturn",
+      "mass": 5.6834e26,
+      "radius": 58232000.0,
+      "orbit": {
+        "semi_major_axis": 1426725413349.3,
+        "eccentricity": 0.05415060,
+        "inclination": 0.04336201,
+        "longitude_of_asc_node": 1.98470186,
+        "argument_of_periapsis": 5.91172514,
+        "mean_anomaly_at_epoch": 5.54163645,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Uranus",
+      "mass": 8.6810e25,
+      "radius": 25362000.0,
+      "orbit": {
+        "semi_major_axis": 2870972230193.3,
+        "eccentricity": 0.04716771,
+        "inclination": 0.01343659,
+        "longitude_of_asc_node": 1.29555581,
+        "argument_of_periapsis": 1.68833308,
+        "mean_anomaly_at_epoch": 2.48304397,
+        "mu": 1.32712440042e20
+      }
+    },
+    {
+      "name": "Neptune",
+      "mass": 1.0241e26,
+      "radius": 24622000.0,
+      "orbit": {
+        "semi_major_axis": 4498252909471.9,
+        "eccentricity": 0.00858587,
+        "inclination": 0.03087784,
+        "longitude_of_asc_node": 2.29897719,
+        "argument_of_periapsis": 4.76910625,
+        "mean_anomaly_at_epoch": 4.53626222,
+        "mu": 1.32712440042e20
+      }
+    }
+  ]
+}
