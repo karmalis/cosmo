@@ -27,7 +27,7 @@ void SystemFactory::SpawnSystem(entt::registry& registry,
     registry.emplace<components::Mass>(entity, mass);
     registry.emplace<components::Radius>(entity, radius);
     registry.emplace<components::KeplerParameters>(entity, orbit);
-    registry.emplace<components::Position>(entity, 0.0f, 0.0f, 0.0f);
+    registry.emplace<components::Position>(entity, 0.0, 0.0, 0.0);
   }
 }
 
@@ -35,7 +35,7 @@ entt::entity SystemFactory::SpawnStar(entt::registry& registry,
                                       const SystemDefinition& definition) {
   const auto star = registry.create();
   registry.emplace<components::Name>(star, definition.name);
-  registry.emplace<components::Position>(star, 0.0f, 0.0f, 0.0f);
+  registry.emplace<components::Position>(star, 0.0, 0.0, 0.0);
   return star;
 }
 

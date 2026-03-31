@@ -5,15 +5,18 @@
 #ifndef COSMO_SYSTEM_H
 #define COSMO_SYSTEM_H
 
+#include <SFML/Graphics/VertexArray.hpp>
 #include <entt/entt.hpp>
 
 #include "KeplerSolver.h"
 #include "SystemFactory.h"
 #include <SFML/Graphics.hpp>
 
+#include <unordered_map>
+
 namespace cosmo::orbital {
 
-constexpr double kTimeStep = 0.1;
+constexpr double kTimeStep = 1;
 constexpr double kDefaultTimeCompression = 1000.0;
 
 class Simulation {
@@ -25,7 +28,7 @@ class Simulation {
 
   void SingleSimulationStep(entt::registry& registry, const double& time_step);
 
-  void Render(entt::registry& registry, sf::RenderTexture& render_texture, sf::Font& font);
+  void DisplayControlUi();
 
  private:
   double simulation_time_{};

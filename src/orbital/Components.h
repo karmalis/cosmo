@@ -10,7 +10,7 @@
 namespace cosmo::orbital::components {
 
 struct Position {
-    float x, y, z;
+    double x, y, z;
 };
 
 struct Name {

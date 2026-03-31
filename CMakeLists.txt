@@ -46,13 +46,9 @@ FetchContent_MakeAvailable(glaze)
 
 add_executable(cosmo src/main.cpp
         src/orbital/KeplerSolver.cpp
-        src/orbital/KeplerSolver.h
         src/orbital/Simulation.cpp
-        src/orbital/Simulation.h
         src/orbital/SystemFactory.cpp
-        src/orbital/SystemFactory.h
-        src/orbital/BodyRenderer.cpp
-        src/orbital/BodyRenderer.h)
+        src/tactical/Tacview.cpp)
 
 target_compile_features(cosmo PRIVATE cxx_std_20)
 target_link_libraries(cosmo PRIVATE ImGui-SFML::ImGui-SFML gmp EnTT::EnTT glaze::glaze)

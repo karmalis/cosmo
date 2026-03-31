@@ -4,12 +4,17 @@
 
 #include "Simulation.h"
 
-#include "BodyRenderer.h"
+#include <imgui.h>
+
+#include <SFML/Graphics/PrimitiveType.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+
 #include "Components.h"
+#include "KeplerSolver.h"
 
 namespace cosmo::orbital {
 
-Simulation::Simulation() = default;
+Simulation::Simulation() {}
 
 bool Simulation::Initialize(entt::registry& registry,
                             const std::string& system_path) {
@@ -26,42 +31,59 @@ bool Simulation::Initialize(entt::registry& registry,
 
 void Simulation::Update(entt::registry& registry, const sf::Time& dt) {
   const auto real_delta_time = static_cast<double>(dt.asSeconds());
-  accumulator_ += real_delta_time * time_compression_;
+  simulation_time_ += real_delta_time * time_compression_;
 
-  while (accumulator_ >= kTimeStep) {
-    SingleSimulationStep(registry, kTimeStep);
-    simulation_time_ += kTimeStep;
-    accumulator_ -= kTimeStep;
-  }
-}
-void Simulation::SingleSimulationStep(entt::registry& registry,
-                                      const double& time_step) {
+  // For analytical orbits, we can update positions directly to the new
+  // simulation_time_ without fixed-step integration.
   const auto view =
       registry.view<components::Position, const components::KeplerParameters>();
 
   view.each([this](auto& position, const auto& params) {
-    position = solver_.ComputePosition(params, simulation_time_, 10);
+    position = solver_.ComputePosition(params, simulation_time_, 5);
   });
+
+  // if (should_compute_orbits) {
+
+  //     orbit_lines_.emplace(name, ComputeOrbitLine(params));
+  //   }
+
+  // If we had numerical components, we would still use the accumulator here
+  // accumulator_ += real_delta_time * time_compression_;
+  // while (accumulator_ >= kTimeStep) {
+  //   ...
+  // }
 }
-void Simulation::Render(entt::registry& registry,
-                        sf::RenderTexture& render_texture, sf::Font& font) {
-  const auto view =
-      registry.view<const components::Position, const components::Name>();
 
-  // 2560, 1440u
-  float cx = 2560.f / 2.f;
-  float cy = 1440.f / 2.f;
-
-  BodyRenderer::RenderParams body_render_params {
-    .focal_point = components::Position{.x = 0.0, .y = 0.0, .z = 0.0},
-    .screen_center = sf::Vector2f{cx, cy},
-    .visual_scale = 10.0,
-    .font = font
-  };
-
-  view.each(
-      [this, &render_texture, &body_render_params](const auto& position, const auto& name) {
-        BodyRenderer::Render(name.value, render_texture, position, body_render_params);
-      });
+void Simulation::SingleSimulationStep(entt::registry& registry,
+                                      const double& time_step) {
+  // Currently unused as orbits are analytical, but kept for future numerical
+  // integration.
 }
+
+void Simulation::DisplayControlUi() {
+  ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Simulation controls");
+
+  ImGui::Text("Simulation Time: %.2f s", simulation_time_);
+
+  // Use a logarithmic scale for time compression as it can span many orders
+  // of magnitude
+  static float log_tc = std::log10(static_cast<float>(time_compression_));
+  if (ImGui::SliderFloat("Time Compression", &log_tc, 0.0f, 10.0f)) {
+    time_compression_ = std::pow(10.0, static_cast<double>(log_tc));
+  }
+  ImGui::Text("Current Speed: %.0fx", time_compression_);
+
+  if (ImGui::Button("Reset Time")) {
+    simulation_time_ = 0.0;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Pause")) {
+    time_compression_ = 0.0;
+    log_tc = 0.0f;
+  }
+
+  ImGui::End();
+}
+
 }  // namespace cosmo::orbital

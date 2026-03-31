@@ -11,13 +11,13 @@ namespace cosmo::orbital {
 
 class KeplerSolver {
  public:
-  KeplerSolver() = default;
-
-  components::Position ComputePosition(
+  static components::Position ComputePosition(
       const components::KeplerParameters& orbit, const double& time,
       const size_t& iterations);
 
- private:
+  static components::Position ComputePositionFromMeanAnomaly(
+      const components::KeplerParameters& orbit, const double& mean_anomaly,
+      const size_t& iterations);
 };
 
 }  // namespace cosmo::orbital
