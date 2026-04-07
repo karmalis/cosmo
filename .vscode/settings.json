@@ -1,0 +1,4 @@
+{
+    "clangd.pathFallback": "clangd",
+    "clangd.path": "/sbin/clangd"
+}

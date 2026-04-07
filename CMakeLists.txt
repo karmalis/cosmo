@@ -10,6 +10,7 @@ add_subdirectory(vendor/entt EXCLUDE_FROM_ALL)
 
 SET(glaze_ENABLE_AVX2 OFF)
 
+
 include(FetchContent)
 FetchContent_Declare(SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -42,40 +43,36 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glaze)
 
-
-
 add_executable(cosmo src/main.cpp
         src/orbital/KeplerSolver.cpp
         src/orbital/Simulation.cpp
         src/orbital/SystemFactory.cpp
-        src/tactical/Tacview.cpp)
+        src/tactical/Tacview.cpp
+        src/tactical/Tacicon.cpp
+        src/ui/DebugContactUi.cpp
+        src/ui/OrbitalCursor.cpp)
 
 target_compile_features(cosmo PRIVATE cxx_std_20)
 target_link_libraries(cosmo PRIVATE ImGui-SFML::ImGui-SFML gmp EnTT::EnTT glaze::glaze)
 
-set(FONT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/cabin")
-set(FONT_DEST_DIR "${CMAKE_BINARY_DIR}/bin/fonts")
-file(GLOB FONT_FILES "${FONT_SOURCE_DIR}/*.ttf")
+set(FONT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/fonts")
+set(FONT_DEST_DIR "$<TARGET_FILE_DIR:cosmo>/bin/fonts")
 
 add_custom_command(
         TARGET cosmo
         POST_BUILD
-        # 1. Create directory explicitly at build time
         COMMAND ${CMAKE_COMMAND} -E make_directory ${FONT_DEST_DIR}
-        # 2. Copy files
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FONT_FILES} ${FONT_DEST_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${FONT_SOURCE_DIR} ${FONT_DEST_DIR}
         COMMENT "Copying fonts to ${FONT_DEST_DIR}"
 )
 
 set(DATA_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data")
-set(DATA_DEST_DIR "${CMAKE_BINARY_DIR}")
-file(GLOB DATA_FILES "${DATA_SOURCE_DIR}/*")
+set(DATA_DEST_DIR "$<TARGET_FILE_DIR:cosmo>/data")
 
 add_custom_command(
         TARGET cosmo
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${DATA_DEST_DIR}
-        # 2. Copy files
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DATA_SOURCE_DIR} ${DATA_DEST_DIR}
-        COMMENT "Copying data to ${DATA_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${DATA_SOURCE_DIR} ${DATA_DEST_DIR}
+        COMMENT "Copying data contents to ${DATA_DEST_DIR}"
 )

@@ -16,8 +16,8 @@ namespace cosmo::orbital {
 
 Simulation::Simulation() {}
 
-bool Simulation::Initialize(entt::registry& registry,
-                            const std::string& system_path) {
+bool Simulation::Initialize(entt::registry &registry,
+                            const std::string &system_path) {
   if (const auto definition = SystemFactory::LoadDefinition(system_path);
       definition.has_value()) {
     SystemFactory::SpawnStar(registry, definition.value());
@@ -29,7 +29,7 @@ bool Simulation::Initialize(entt::registry& registry,
   return false;
 }
 
-void Simulation::Update(entt::registry& registry, const sf::Time& dt) {
+void Simulation::Update(entt::registry &registry, const sf::Time &dt) {
   const auto real_delta_time = static_cast<double>(dt.asSeconds());
   simulation_time_ += real_delta_time * time_compression_;
 
@@ -38,24 +38,13 @@ void Simulation::Update(entt::registry& registry, const sf::Time& dt) {
   const auto view =
       registry.view<components::Position, const components::KeplerParameters>();
 
-  view.each([this](auto& position, const auto& params) {
+  view.each([this](auto &position, const auto &params) {
     position = solver_.ComputePosition(params, simulation_time_, 5);
   });
-
-  // if (should_compute_orbits) {
-
-  //     orbit_lines_.emplace(name, ComputeOrbitLine(params));
-  //   }
-
-  // If we had numerical components, we would still use the accumulator here
-  // accumulator_ += real_delta_time * time_compression_;
-  // while (accumulator_ >= kTimeStep) {
-  //   ...
-  // }
 }
 
-void Simulation::SingleSimulationStep(entt::registry& registry,
-                                      const double& time_step) {
+void Simulation::SingleSimulationStep(entt::registry &registry,
+                                      const double &time_step) {
   // Currently unused as orbits are analytical, but kept for future numerical
   // integration.
 }
@@ -86,4 +75,4 @@ void Simulation::DisplayControlUi() {
   ImGui::End();
 }
 
-}  // namespace cosmo::orbital
+} // namespace cosmo::orbital

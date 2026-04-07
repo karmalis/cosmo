@@ -13,12 +13,29 @@ constexpr float kZoomMax = 1000.0;
 
 constexpr int kPlanetLineSegmentCount = 200;
 
-void Tacview::Render(entt::registry& registry,
-                     sf::RenderTexture& render_texture) {
-  for (const auto line : orbital_lines_) {
+void Tacview::Render(entt::registry &registry,
+                     sf::RenderTexture &render_texture) {
+  for (const auto &line : orbital_lines_) {
     render_texture.draw(line.second);
   }
 
+  // Draw contacts (ships, stations, etc.)
+  const auto contact_view =
+      registry.view<const orbital::components::Position,
+                    const components::ContactIcon,
+                    const components::AffiliationComponent,
+                    const components::ContactTypeComponent>();
+
+  contact_view.each(
+      [this, &render_texture](const auto &position, const auto &icon,
+                              const auto &affiliation, const auto &type) {
+        if (!icon.visible)
+          return;
+        const auto pos = GetScreenPosition(position);
+        RenderIcon(render_texture, pos, affiliation.value, type.value);
+      });
+
+  // Draw bodies (planets, stars, etc. that don't have ContactIcon)
   sf::CircleShape orbital_circle;
   orbital_circle.setFillColor(sf::Color::White);
   orbital_circle.setOutlineColor(sf::Color::Green);
@@ -28,10 +45,13 @@ void Tacview::Render(entt::registry& registry,
   sf::Text body_label(view_params_.label_font);
   body_label.setFillColor(sf::Color::White);
   body_label.setCharacterSize(16);
-  const auto view = registry.view<const orbital::components::Position,
-                                  const orbital::components::Name>();
-  view.each([this, &orbital_circle, &body_label, &render_texture](
-                const auto& position, const auto& name) {
+
+  const auto body_view = registry.view<const orbital::components::Position,
+                                       const orbital::components::Name>(
+      entt::exclude<components::ContactIcon>);
+
+  body_view.each([this, &orbital_circle, &body_label,
+                  &render_texture](const auto &position, const auto &name) {
     const auto pos = GetScreenPosition(position);
     orbital_circle.setPosition(pos);
     body_label.setString(name.value);
@@ -42,18 +62,26 @@ void Tacview::Render(entt::registry& registry,
   });
 }
 
+void Tacview::RenderIcon(sf::RenderTexture &render_texture,
+                         const sf::Vector2f &pos,
+                         const components::Affiliation affiliation,
+                         const components::ContactType type) {
+  tacicon_.Draw(render_texture, pos, affiliation, type);
+}
+
 void Tacview::DisplayControlUi() {
   ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
   ImGui::Begin("Tacview controls");
 
-  if (ImGui::SliderFloat("Zoom", &view_params_.visual_scale, kZoomMin, kZoomMax)) {
+  if (ImGui::SliderFloat("Zoom", &view_params_.visual_scale, kZoomMin,
+                         kZoomMax)) {
     needs_update_ = true;
   }
 
   ImGui::End();
 }
 
-void Tacview::UpdateOrbitalLines(entt::registry& registry) {
+void Tacview::UpdateOrbitalLines(entt::registry &registry) {
   orbital_lines_.clear();
   const auto view = registry.view<const orbital::components::KeplerParameters,
                                   const orbital::components::Name>();
@@ -75,15 +103,15 @@ void Tacview::UpdateOrbitalLines(entt::registry& registry) {
   }
 }
 
-void Tacview::Update(entt::registry& registry) {
-    if (needs_update_) {
-        UpdateOrbitalLines(registry);
-        needs_update_ = false;
-    }
+void Tacview::Update(entt::registry &registry) {
+  if (needs_update_) {
+    UpdateOrbitalLines(registry);
+    needs_update_ = false;
+  }
 }
 
-sf::Vector2f Tacview::GetScreenPosition(
-    const orbital::components::Position& position) {
+sf::Vector2f
+Tacview::GetScreenPosition(const orbital::components::Position &position) {
   const auto rel_x = position.x - view_params_.focal_point.x;
   const auto rel_y = position.y - view_params_.focal_point.y;
 
@@ -97,4 +125,20 @@ sf::Vector2f Tacview::GetScreenPosition(
   return sf::Vector2f{screen_x, screen_y};
 }
 
-}  // namespace cosmo::tactical
+orbital::components::Position
+Tacview::GetPositionFromScreen(const sf::Vector2f &position) {
+
+  const double rel_x =
+      ((static_cast<double>(position.x) - view_params_.screen_center.x) /
+       view_params_.visual_scale) *
+      kAU;
+  const double rel_y =
+      ((static_cast<double>(position.y) - view_params_.screen_center.x) /
+       view_params_.visual_scale) *
+      kAU;
+
+  return orbital::components::Position{.x = rel_x + view_params_.focal_point.x,
+                                       .y = rel_y + view_params_.focal_point.y};
+}
+
+} // namespace cosmo::tactical

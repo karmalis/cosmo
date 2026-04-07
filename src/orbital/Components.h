@@ -10,19 +10,21 @@
 namespace cosmo::orbital::components {
 
 struct Position {
-    double x, y, z;
+  double x, y, z;
 };
 
+struct Cursor {};
+
 struct Name {
-    std::string value;
+  std::string value;
 };
 
 struct Mass {
-    double value; // kg
+  double value; // kg
 };
 
 struct Radius {
-    double value; // m
+  double value; // m
 };
 
 struct KeplerParameters {
@@ -35,7 +37,6 @@ struct KeplerParameters {
   double mu; // standard grav parameter
 };
 
+} // namespace cosmo::orbital::components
 
-}
-
-#endif  // COSMO_COMPONENTS_H
+#endif // COSMO_COMPONENTS_H
