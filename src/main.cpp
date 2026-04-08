@@ -1,16 +1,16 @@
 #include <imgui-SFML.h>
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 
 #include "orbital/Components.h"
 #include "orbital/Simulation.h"
 #include "tactical/Components.h"
 #include "tactical/Tacview.h"
+#include "ui/ContactInfoPanel.h"
 #include "ui/OrbitalCursor.h"
 
-constexpr unsigned kScreenWidth = 2560;
-constexpr unsigned kScreenHeight = 1440;
+constexpr unsigned kScreenWidth = 1645;
+constexpr unsigned kScreenHeight = 925;
 
 int main() {
   sf::ContextSettings settings;
@@ -28,16 +28,17 @@ int main() {
   render_texture.setSmooth(true);
 
   sf::Font debug_font("bin/fonts/cabin/Cabin-VariableFont_wdth,wght.ttf");
+  sf::Font ui_font("bin/fonts/Play-Regular.ttf");
 
   entt::registry registry;
 
   float cx = static_cast<float>(kScreenWidth) / 2.f;
   float cy = static_cast<float>(kScreenHeight) / 2.f;
   cosmo::tactical::Tacview::ViewParams tacview_params{
-      .focal_point = sf::Vector2f{0.0, 0.0f},
+      .focal_point = cosmo::orbital::components::Position{0.0, 0.0, 0.0},
       .screen_center = sf::Vector2f{cx, cy},
       .visual_scale = 250.0f,
-      .label_font = debug_font};
+      .label_font = std::ref(debug_font)};
   cosmo::tactical::Tacview tacview(tacview_params);
 
   cosmo::orbital::Simulation simulation;
@@ -103,6 +104,9 @@ int main() {
       munitions_contact, cosmo::tactical::components::ContactType::kMunition);
 
   cosmo::ui::OrbitalCursor cursor(cursor_entity, std::ref(tacview));
+  cosmo::ui::ContactInfoPanel info_panel(
+      cosmo::ui::ContactInfoPanel::Params{std::ref(ui_font)},
+      std::ref(tacview));
 
   sf::Clock delta_clock;
   while (window.isOpen()) {
@@ -116,7 +120,7 @@ int main() {
       }
 
       auto evt = event.value();
-      cursor.HandleInput(&evt, registry);
+      cursor.HandleInput(window, &evt, registry);
     }
 
     // Update logic
@@ -128,14 +132,16 @@ int main() {
 
     // Render
     window.clear();
-    render_texture.clear();
+    render_texture.clear(sf::Color(24, 24, 24, 255));
 
     tacview.Render(registry, render_texture);
     cursor.Draw(render_texture);
 
+    info_panel.Render(registry, unknown_contact, render_texture);
+
     tacview.DisplayControlUi();
     // simulation.DisplayControlUi();
-    cursor.DisplayControlUi();
+    cursor.DisplayControlUi(registry);
 
     render_texture.display();
 

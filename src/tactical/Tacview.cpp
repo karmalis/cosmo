@@ -36,28 +36,27 @@ void Tacview::Render(entt::registry &registry,
       });
 
   // Draw bodies (planets, stars, etc. that don't have ContactIcon)
-  sf::CircleShape orbital_circle;
-  orbital_circle.setFillColor(sf::Color::White);
-  orbital_circle.setOutlineColor(sf::Color::Green);
-  orbital_circle.setRadius(5);
-  orbital_circle.setOutlineThickness(1.0);
-  orbital_circle.setOrigin({2.5, 2.5});
   sf::Text body_label(view_params_.label_font);
   body_label.setFillColor(sf::Color::White);
-  body_label.setCharacterSize(16);
+  body_label.setCharacterSize(18);
 
-  const auto body_view = registry.view<const orbital::components::Position,
-                                       const orbital::components::Name>(
+  tacicon_.DrawStar(
+      render_texture,
+      GetScreenPosition(orbital::components::Position{0.f, 0.f, 0.f}));
+
+  const auto body_view = registry.view<
+      const orbital::components::Position, const orbital::components::Mass,
+      const orbital::components::Radius, const orbital::components::Name>(
       entt::exclude<components::ContactIcon>);
 
-  body_view.each([this, &orbital_circle, &body_label,
-                  &render_texture](const auto &position, const auto &name) {
+  body_view.each([this, &body_label,
+                  &render_texture](const auto &position, const auto &mass,
+                                   const auto &radius, const auto &name) {
     const auto pos = GetScreenPosition(position);
-    orbital_circle.setPosition(pos);
     body_label.setString(name.value);
-    body_label.setPosition(sf::Vector2f{pos.x + 10, pos.y + 10});
+    body_label.setPosition(sf::Vector2f{pos.x + 15, pos.y + 15});
 
-    render_texture.draw(orbital_circle);
+    tacicon_.DrawSystemBody(render_texture, pos, mass.value, radius.value);
     render_texture.draw(body_label);
   });
 }
@@ -66,7 +65,7 @@ void Tacview::RenderIcon(sf::RenderTexture &render_texture,
                          const sf::Vector2f &pos,
                          const components::Affiliation affiliation,
                          const components::ContactType type) {
-  tacicon_.Draw(render_texture, pos, affiliation, type);
+  tacicon_.DrawContact(render_texture, pos, affiliation, type);
 }
 
 void Tacview::DisplayControlUi() {
@@ -127,14 +126,13 @@ Tacview::GetScreenPosition(const orbital::components::Position &position) {
 
 orbital::components::Position
 Tacview::GetPositionFromScreen(const sf::Vector2f &position) {
-
   const double rel_x =
       ((static_cast<double>(position.x) - view_params_.screen_center.x) /
        view_params_.visual_scale) *
       kAU;
   const double rel_y =
-      ((static_cast<double>(position.y) - view_params_.screen_center.x) /
-       view_params_.visual_scale) *
+      ((static_cast<double>(position.y) - view_params_.screen_center.y) /
+       (-view_params_.visual_scale)) *
       kAU;
 
   return orbital::components::Position{.x = rel_x + view_params_.focal_point.x,

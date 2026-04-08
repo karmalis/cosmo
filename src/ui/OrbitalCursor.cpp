@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 
+#include <SFML/System/Vector2.hpp>
 #include <iostream>
 
 namespace cosmo::ui {
@@ -39,7 +40,7 @@ void OrbitalCursor::Update(entt::registry &registry) {
   position_ = tacview_.get().GetScreenPosition(position);
 }
 
-void OrbitalCursor::DisplayControlUi() {
+void OrbitalCursor::DisplayControlUi(entt::registry &registry) {
   ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
   ImGui::Begin("Orbital Cursor controls");
 
@@ -53,19 +54,38 @@ void OrbitalCursor::DisplayControlUi() {
     should_expect_input_ = true;
   }
 
+  const auto orbital_pos = registry.get<orbital::components::Position>(entity_);
+  ImGui::Text("Current screen pos: %.0f %.0f", position_.x, position_.y);
+  ImGui::Text("Current orbital pos: %.0f %.0f", orbital_pos.x, orbital_pos.y);
+
   ImGui::End();
 }
 
-void OrbitalCursor::HandleInput(sf::Event *event, entt::registry &registry) {
+void OrbitalCursor::HandleInput(sf::RenderTarget &target, sf::Event *event,
+                                entt::registry &registry) {
   if (!should_expect_input_) {
     return;
   }
 
+  // if (ImGui::GetIO().WantCaptureMouse) {
+  //   return;
+  // }
+
   if (const auto *buttonReleased =
           event->getIf<sf::Event::MouseButtonReleased>()) {
     if (buttonReleased->button == sf::Mouse::Button::Left) {
-      const auto &positon = buttonReleased->position;
-      // const auto& adjusted_position = tacview_.get().
+      const auto &position = buttonReleased->position;
+      const auto &position_f = target.mapPixelToCoords(position);
+
+      const auto &adjusted_position =
+          tacview_.get().GetPositionFromScreen(position_f);
+
+      registry.patch<orbital::components::Position>(
+          entity_, [this, &adjusted_position](auto &pos) {
+            pos.x = adjusted_position.x;
+            pos.y = adjusted_position.y;
+          });
+      should_expect_input_ = false;
     }
   }
 }

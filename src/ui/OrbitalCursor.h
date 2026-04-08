@@ -28,9 +28,10 @@ public:
   void Draw(sf::RenderTarget &target);
   void Update(entt::registry &registry);
 
-  void DisplayControlUi();
+  void DisplayControlUi(entt::registry &registry);
 
-  void HandleInput(sf::Event *event, entt::registry &registry);
+  void HandleInput(sf::RenderTarget &target, sf::Event *event,
+                   entt::registry &registry);
 
 private:
   sf::Shader shader_;

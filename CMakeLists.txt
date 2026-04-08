@@ -50,7 +50,8 @@ add_executable(cosmo src/main.cpp
         src/tactical/Tacview.cpp
         src/tactical/Tacicon.cpp
         src/ui/DebugContactUi.cpp
-        src/ui/OrbitalCursor.cpp)
+        src/ui/OrbitalCursor.cpp
+        src/ui/ContactInfoPanel.cpp)
 
 target_compile_features(cosmo PRIVATE cxx_std_20)
 target_link_libraries(cosmo PRIVATE ImGui-SFML::ImGui-SFML gmp EnTT::EnTT glaze::glaze)

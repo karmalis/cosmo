@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "../orbital/SystemDefinition.h"
 #include "Components.h"
 
 namespace cosmo::tactical {
@@ -19,15 +20,20 @@ class Tacicon {
 public:
   Tacicon();
 
-  void Draw(sf::RenderTarget &target, const sf::Vector2f &position,
-            components::Affiliation affiliation,
-            components::ContactType contact_type);
+  void DrawContact(sf::RenderTarget &target, const sf::Vector2f &position,
+                   components::Affiliation affiliation,
+                   components::ContactType contact_type);
+
+  void DrawSystemBody(sf::RenderTarget &target, const sf::Vector2f &position,
+                      const double &mass, const double &radius);
+
+  void DrawStar(sf::RenderTarget &target, const sf::Vector2f &position);
 
 private:
   ///
   /// The below depend on
-  /// - self type (weapons are hostile towards and potentially dangerous towards
-  /// all)
+  /// - self type (weapons are hostile towards and potentially dangerous
+  /// towards all)
   /// - affiliation (enemies could be variations of rhombus)
   ///
   std::map<components::Affiliation, sf::Color> affiliation_color_atlas_;
@@ -37,6 +43,8 @@ private:
       contact_type_shader_map_;
 
   sf::RectangleShape quad_;
+  sf::Shader system_body_shader_;
+  sf::Clock scanline_clock_;
 
   void RenderShip(sf::RenderTarget &target, sf::Shader &shader,
                   const sf::Vector2f &position,

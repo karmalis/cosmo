@@ -16,10 +16,10 @@ namespace cosmo::tactical {
 class Tacview {
 public:
   struct ViewParams {
-    sf::Vector2f focal_point;
+    orbital::components::Position focal_point;
     sf::Vector2f screen_center;
     float visual_scale;
-    sf::Font &label_font;
+    std::reference_wrapper<sf::Font> label_font;
   };
 
   Tacview() = delete;
